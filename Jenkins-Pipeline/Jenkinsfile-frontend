@@ -1,0 +1,63 @@
+pipeline{
+    agent{
+         node{
+             label "Slave-1"
+             customWorkspace "/home/jenkins/demo"
+         }
+    }
+    environment{
+        JAVA_HOME="/usr/lib/jvm/java-17-amazon-corretto.x86_64"
+        PATH="$PATH:$JAVA_HOME/bin:/opt/sonar-scanner/bin:/opt/node-v16.0.0/bin:/usr/local/bin"
+    }
+    parameters { 
+        string(name: 'COMMIT_ID', defaultValue: '', description: 'Provide the Commit ID') 
+        string(name: 'REPO_NAME_FRONTEND', defaultValue: '', description: 'Provide the ECR Repository Name for Frontend Application Image')
+        string(name: 'TAG_NAME', defaultValue: '', description: 'Provide the TAG Name')
+    }
+    stages{
+        stage("Clone-Code"){
+            steps{
+                cleanWs()
+                checkout scmGit(branches: [[name: '${COMMIT_ID}']], extensions: [], userRemoteConfigs: [[credentialsId: 'github-cred', url: 'https://github.com/singhritesh85/TWSThreeTierAppChallenge.git']])
+            }
+        }
+        stage("SonarQube-Analysis"){
+            steps{
+                dir("Application-Code/frontend"){
+                    withSonarQubeEnv('SonarQube-Server') {
+                        sh 'sonar-scanner -Dsonar.projectKey=three-tier-app-frontend -Dsonar.projectName=three-tier-app-frontend'
+                    }
+                }
+            }
+        }
+        stage("Quality Gate") {
+            steps {
+                timeout(time: 1, unit: 'HOURS') {
+                    waitForQualityGate abortPipeline: false, credentialsId: 'sonarqube'
+              }
+            }
+        }
+        stage("Docker Build"){
+            steps{
+                dir("Application-Code/frontend"){
+                    //Frontend
+                    sh 'docker system prune -f --all'
+                    sh 'docker build -t demoimage:1.01 .'
+                    sh 'docker tag demoimage:1.01 ${REPO_NAME_FRONTEND}:${TAG_NAME}'
+                    sh 'trivy image --exit-code 0 --severity MEDIUM,HIGH ${REPO_NAME_FRONTEND}:${TAG_NAME}'
+                //    sh 'trivy image  --exit-code 1 --severity CRITICAL ${REPO_NAME_FRONTEND}:${TAG_NAME}'
+                    sh 'aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 027330342406.dkr.ecr.us-east-2.amazonaws.com'
+                    sh 'docker push ${REPO_NAME_FRONTEND}:${TAG_NAME}'
+                }
+            }
+        }
+        stage("Deployment"){
+            steps{
+                //Frontend
+                sh 'argocd login argocd.singhritesh85.com --username admin --password Dexter@123 --skip-test-tls  --grpc-web'
+                sh 'argocd app create frontend --project default --repo https://github.com/singhritesh85/helm-repo-for-ArgoCD-three-tier-app-frontend.git --path ./folo --dest-namespace three-tier --dest-server https://kubernetes.default.svc --helm-set service.port=3000 --helm-set image.repository=${REPO_NAME_FRONTEND} --helm-set image.tag=${TAG_NAME} --helm-set replicaCount=1 --upsert'
+                sh 'argocd app sync frontend'
+            }
+        }
+    }    
+}
