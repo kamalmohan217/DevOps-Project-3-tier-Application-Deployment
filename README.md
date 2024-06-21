@@ -30,5 +30,10 @@ To keep the Docker Images for frontend and backend I have created two Private Re
 <br><br/>
 After Successfully Running the three Jenkins Job (successfully deployment of the three-tier Application) create the URL for the application using the file ingress-rule.yaml present inside the directory ingress-rule-pv-pvc-mongodbsecret with the command kubectl apply -f ingress-rule.yaml. Create a record set for the URL inside the hosted zone as shown in the screenshot below.
 ![image](https://github.com/kamalmohan217/DevOps-Project-3-tier-Application-Deployment/assets/128888356/6eb2685e-5970-4ca2-9360-c6693345176b)
-
+<br><br/>
+Using the created URL backend.singhritesh85.com access the application as shown in the screenshot below.
+![image](https://github.com/kamalmohan217/DevOps-Project-3-tier-Application-Deployment/assets/128888356/16ca4341-760d-436f-b133-0ae42b9183cf)
+![image](https://github.com/kamalmohan217/DevOps-Project-3-tier-Application-Deployment/assets/128888356/2370e631-b08c-4912-92eb-5962708c1a30)
+After Successful deployment we can see the Applications in ArgoCD as shown in the screenshot below.
+![image](https://github.com/kamalmohan217/DevOps-Project-3-tier-Application-Deployment/assets/128888356/98a4e4b1-4a48-43ba-807a-fda667d8fb2a)
 
