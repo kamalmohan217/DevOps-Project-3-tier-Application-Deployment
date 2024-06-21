@@ -37,7 +37,12 @@ Using the created URL backend.singhritesh85.com access the application as shown 
 After Successful deployment we can see the Applications in ArgoCD as shown in the screenshot below.
 ![image](https://github.com/kamalmohan217/DevOps-Project-3-tier-Application-Deployment/assets/128888356/98a4e4b1-4a48-43ba-807a-fda667d8fb2a)
 
-
+<br><br/>
+<br><br/>
+<br><br/>
+<br><br/>
+<br><br/>
+<br><br/>
 ```
 source Code:-  https://github.com/singhritesh85/TWSThreeTierAppChallenge.git
 ```
