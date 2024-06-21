@@ -41,6 +41,12 @@ After Successful deployment we can see the Applications in ArgoCD as shown in th
 ```
 source Code:-  https://github.com/singhritesh85/TWSThreeTierAppChallenge.git
 ```
+<br><br/>
+<br><br/>
+<br><br/>
+<br><br/>
+<br><br/>
+<br><br/>
 ```
 Reference:-   https://github.com/LondheShubham153/TWSThreeTierAppChallenge.git
 ```
